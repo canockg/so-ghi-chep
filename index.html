@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Checklist câu hỏi xác minh nguồn gốc đất</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f6f5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sổ xác minh">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1f2328;--mut:#6b7280;--line:#dcd9d0;--ac:#1f6f5c;--acbg:#e3f1ec;--warn:#b42318;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17191c;--card:#22252a;--tx:#ececec;--mut:#9aa0a6;--line:#3a3e44;--ac:#5fc0a5;--acbg:#1d3a32;--warn:#f08a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17191c;--card:#22252a;--tx:#ececec;--mut:#9aa0a6;--line:#3a3e44;--ac:#5fc0a5;--acbg:#1d3a32;--warn:#f08a80;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:16px 14px 90px}
+h1{font-size:19px;margin:6px 0 12px;line-height:1.3}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.fields{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+.fields .full{grid-column:1/-1}
+@media(max-width:520px){.fields{grid-template-columns:1fr}}
+label.f{display:block;font-size:13px;color:var(--mut);margin-bottom:3px}
+input[type=text],textarea{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+input:focus,textarea:focus{outline:2px solid var(--ac);outline-offset:0}
+textarea{min-height:84px;resize:vertical}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:8px 0;margin-bottom:6px}
+.prog{height:8px;background:var(--line);border-radius:6px;overflow:hidden}
+.prog>i{display:block;height:100%;width:0;background:var(--ac);transition:width .2s}
+.pt{font-size:13px;color:var(--mut);margin-top:4px;display:flex;justify-content:space-between;gap:8px}
+h2{font-size:15px;margin:18px 0 8px;color:var(--ac)}
+.q{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;padding:10px 12px}
+.q.done{border-color:var(--ac);background:var(--acbg)}
+.q label.row{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.q input[type=checkbox]{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--ac)}
+.q .n{font-weight:600;margin-right:4px}
+.ans{margin-top:8px;display:none}
+.q.done .ans{display:block}
+.btns{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;justify-content:center;z-index:9}
+button{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--tx);border-radius:10px;padding:10px 14px;cursor:pointer;flex:1;max-width:160px}
+button.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button.pri{color:#0b1f19}}
+button.out{color:var(--warn)}
+.msg{font-size:13px;color:var(--mut);min-height:18px;text-align:center;margin:2px 0 6px}
+dialog{width:min(720px,94vw);border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--tx);padding:14px}
+dialog textarea{min-height:50vh;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace}
+dialog .btns2{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
+#bye{display:none;text-align:center;padding:60px 20px}
+#printView{display:none}
+@media print{
+ body{background:#fff;color:#000}
+ .wrap,.btns,dialog{display:none!important}
+ #printView{display:block;font:13pt/1.45 "Times New Roman",serif;padding:0}
+ #printView h1{font-size:15pt;text-align:center}
+ #printView h2{font-size:13pt;color:#000;margin:14px 0 6px}
+ #printView .pq{margin:0 0 9px;page-break-inside:avoid}
+ #printView .pa{margin:2px 0 0 18px;border-left:2px solid #999;padding-left:8px;white-space:pre-wrap}
+}
+
+body{background:radial-gradient(circle at 0 0,var(--acbg),transparent 40%),var(--bg);background-repeat:no-repeat}
+.wrap{max-width:900px}
+.hero{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#1f6f5c,#2f9a80);color:#fff;border-radius:16px;padding:16px 18px;margin:4px 0 14px;box-shadow:0 6px 18px rgba(31,111,92,.28)}
+.hero h1{margin:0;font-size:18px;color:#fff;line-height:1.35}
+.hero .sub{font-size:13px;opacity:.85;margin-top:2px}
+.logo{font-size:30px;background:rgba(255,255,255,.18);border-radius:12px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;flex:none}
+.card{box-shadow:0 2px 8px rgba(0,0,0,.06);border-radius:14px}
+.prog{height:10px;border-radius:8px}
+.prog>i{background:linear-gradient(90deg,#2f9a80,#1f6f5c)}
+h2{display:flex;align-items:center;gap:8px;font-size:15px;margin:22px 0 10px;padding:8px 12px;background:var(--acbg);border-left:5px solid var(--ac);border-radius:8px}
+.q{box-shadow:0 1px 4px rgba(0,0,0,.05);transition:transform .12s,box-shadow .12s}
+.q:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.10)}
+.q .n{color:var(--ac)}
+.q.done .n::before{content:"✔ "}
+button{transition:filter .12s,transform .12s;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+button:hover{filter:brightness(.96);transform:translateY(-1px)}
+button.pri{box-shadow:0 3px 10px rgba(31,111,92,.35)}
+.btns{box-shadow:0 -4px 14px rgba(0,0,0,.08)}
+.btns button{max-width:170px}
+dialog#pv{width:min(900px,96vw);padding:0;overflow:hidden}
+dialog#pv::backdrop{background:rgba(0,0,0,.55)}
+.pvh{display:flex;flex-direction:column;gap:2px;padding:12px 16px;background:var(--acbg);border-bottom:1px solid var(--line)}
+.pvh span{font-size:13px;color:var(--mut)}
+.paper{background:#fff;color:#000;margin:14px auto;padding:26px 30px;width:calc(100% - 28px);max-height:62vh;overflow:auto;border:1px solid #d0d0d0;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+dialog#pv .btns2{padding:0 16px 14px;margin-top:0}
+.tb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.tb button{flex:none;max-width:none}
+.curl{font-size:13px;color:var(--mut);flex:1;min-width:180px}
+dialog#lst{width:min(720px,96vw);padding:0;overflow:hidden}
+dialog#lst::backdrop{background:rgba(0,0,0,.55)}
+.lstb{padding:12px 16px;max-height:58vh;overflow:auto}
+.li{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:8px}
+.li.cur{border-color:var(--ac);background:var(--acbg)}
+.lm{flex:1;min-width:0}
+.ls{font-size:13px;color:var(--mut)}
+.li button{flex:none;max-width:none;padding:7px 12px}
+.empty{color:var(--mut);text-align:center;padding:20px}
+@media print{#pv,#lst,.tb{display:none!important}}
+/* Sửa cuộn trên điện thoại */
+.wrap{padding-bottom:calc(var(--bh,140px) + 28px)}
+input,textarea{min-width:0;max-width:100%}
+dialog#pv,dialog#lst{max-height:90vh;max-height:calc(100dvh - 24px)}
+dialog#pv[open],dialog#lst[open]{display:flex;flex-direction:column}
+.paper,.lstb{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.pvh,dialog .btns2{flex:none}
+dialog .btns2{flex-wrap:wrap}
+#nojs{background:#fff4e5;color:#7a3e00;border:1px solid #f0b46a;border-radius:12px;padding:12px 14px;margin:12px;font-size:15px}
+.dwrap{display:flex;gap:8px;align-items:stretch;position:relative}
+.dwrap input[type=text]{flex:1}
+.dwrap button{flex:none;max-width:none;padding:6px 12px}
+.dwrap input.dpick{position:absolute;right:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0}
+input.bad{border-color:var(--warn);outline-color:var(--warn)}
+.derr{font-size:12px;color:var(--warn);min-height:0;margin-top:3px}
+#hint{display:none;background:#e8f3ff;color:#0b3d6b;border:1px solid #9cc7f0;border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:14px;line-height:1.45}
+#hint b{display:block;margin-bottom:2px}
+#hint button{flex:none;max-width:none;padding:4px 10px;font-size:13px;margin-top:6px}
+.lbk{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 10px}
+.lbk button{flex:1 1 30%;max-width:none;font-size:14px;padding:8px 6px}
+</style>
+</head>
+<body>
+<div id="nojs"><b>Trình xem này không chạy được ứng dụng.</b> Một số trình xem file trên điện thoại (ví dụ xem trước trong ứng dụng Tệp, Zalo, Messenger) không chạy JavaScript nên danh sách câu hỏi không hiện. Hãy mở file bằng Safari hoặc Chrome.</div>
+<div class="wrap" id="app">
+ <div class="hero"><div class="logo">📋</div><div><h1>Đề cương câu hỏi đối với người biết việc liên quan đến nguồn gốc đất</h1><div class="sub">Checklist ghi nhận nội dung làm việc</div></div></div>
+ <div id="hint"></div>
+ <div class="tb"><button class="pri" id="bNew">➕ Thêm mới</button><button id="bList">📚 Danh sách đã hỏi <span id="cnt"></span></button><span class="curl" id="cur"></span></div>
+ <div class="card"><div class="fields">
+  <div><label class="f" for="asker">Người hỏi</label><input type="text" id="asker" autocomplete="off" placeholder="Họ và tên người hỏi"></div>
+  <div><label class="f" for="resp">Người trả lời</label><input type="text" id="resp" autocomplete="off" placeholder="Họ và tên người trả lời"></div>
+  <div class="full"><label class="f" for="date">Ngày làm việc</label><div class="dwrap"><input type="text" id="date" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/yyyy"><button type="button" id="dCal" title="Chọn ngày trên lịch">📅</button><input type="date" class="dpick" id="dPick" tabindex="-1" aria-hidden="true"></div><div class="derr" id="dErr"></div></div>
+  <div class="full"><label class="f" for="note">Ghi chú chung cho buổi làm việc</label><textarea id="note" placeholder="Địa điểm, thành phần tham dự, nhận xét chung…"></textarea></div>
+ </div></div>
+ <div class="bar"><div class="prog"><i id="pb"></i></div><div class="pt"><span id="pc">Đã hỏi 0/0 câu</span><span id="ps"></span></div></div>
+ <div id="list"></div>
+ <div class="msg" id="msg"></div>
+</div>
+<div class="btns" id="btns">
+ <button class="pri" id="bSave">💾 Lưu</button>
+ <button id="bPrev">👁 Xem trước</button>
+ <button id="bExp">📄 Xuất Word</button>
+ <button id="bPrint">🖨 In</button>
+ <button class="out" id="bQuit">⏏ Thoát</button>
+</div>
+<div id="bye"><h1>Đã thoát</h1><p>Dữ liệu đã lưu vẫn còn trên máy này. Bạn có thể đóng cửa sổ.</p><button id="bBack" style="max-width:220px">Quay lại làm việc</button></div>
+<div id="printView"></div>
+<dialog id="lst"><div class="pvh"><b>Danh sách các bảng đã hỏi</b><span>Chọn một bảng để mở lại, xem trước, xuất hoặc in</span></div><div class="lstb" id="lstBody"></div><div class="lbk"><button id="lBak">⬇ Sao lưu</button><button id="lRes">⬆ Khôi phục</button><button class="out" id="lClr">🗑 Xóa tất cả</button></div><input type="file" id="resFile" accept=".json,application/json,text/plain" style="display:none"><div class="btns2" style="padding:0 16px 14px;margin-top:0"><button id="lClose" style="max-width:none;flex:none">Đóng</button><button class="pri" id="lNew" style="max-width:none;flex:none">➕ Thêm mới</button></div></dialog>
+<dialog id="pv"><div class="pvh"><b>Xem trước bản xuất</b><span>Kiểm tra nội dung rồi chọn Xuất Word hoặc In</span></div><div class="paper" id="pvBody"></div><div class="btns2"><button id="pvClose" style="max-width:none;flex:none">Đóng</button><button id="pvPrint" style="max-width:none;flex:none">🖨 In</button><button class="pri" id="pvExp" style="max-width:none;flex:none">📄 Xuất Word</button></div></dialog>
+<dialog id="dlg"><div style="font-weight:600;margin-bottom:8px">Nội dung xuất</div><textarea id="dtx" readonly></textarea><div class="btns2"><button id="dCopy" style="max-width:none;flex:none">Sao chép</button><button id="dClose" style="max-width:none;flex:none">Đóng</button></div></dialog>
+
+<script>
+document.getElementById("nojs").style.display="none";
+const TITLE="ĐỀ CƯƠNG CÂU HỎI ĐỐI VỚI NGƯỜI BIẾT VIỆC LIÊN QUAN ĐẾN NGUỒN GỐC ĐẤT";
+const S=[
+{t:"I. Về nhân thân và quá trình sinh sống tại địa phương",q:[
+"Ông/bà sinh sống tại địa phương từ thời gian nào? Quá trình cư trú, sinh sống và làm việc tại địa phương qua các thời kỳ như thế nào?",
+"Ông/bà có biết khu đất đang được xác minh không? Biết từ thời điểm nào và thông qua những điều kiện, hoàn cảnh nào?",
+"Vị trí khu đất ở đâu, có đặc điểm gì để nhận biết? Có tiếp giáp với đất của hộ gia đình, cá nhân nào?",
+"Ông/bà có thường xuyên đi lại, sinh sống, sản xuất hoặc hoạt động tại khu vực có khu đất nêu trên không?",
+"Ông/bà có mối quan hệ như thế nào với người đang quản lý, sử dụng đất và những cá nhân có liên quan?"]},
+{t:"II. Về nguồn gốc và quá trình hình thành khu đất",q:[
+"Theo hiểu biết của ông/bà, khu đất có nguồn gốc hình thành như thế nào? Ai là người đầu tiên khai phá, tạo lập và quản lý, sử dụng?",
+"Ông/bà biết việc khai phá, tạo lập khu đất từ thời điểm nào? Có trực tiếp chứng kiến hay không?",
+"Trước khi được khai phá, khu đất có hiện trạng như thế nào, do ai quản lý hoặc thuộc phạm vi quản lý của tổ chức, cơ quan nào?",
+"Ông/bà căn cứ vào những sự việc, tài liệu hoặc thông tin cụ thể nào để xác định người khai phá, sử dụng đất đầu tiên?",
+"Có những cá nhân nào khác cùng tham gia khai phá, quản lý hoặc biết rõ quá trình hình thành khu đất không?"]},
+{t:"III. Về quá trình quản lý, sử dụng và chuyển giao đất",q:[
+"Từ khi hình thành đến nay, ông/bà biết những ai đã từng quản lý, sử dụng khu đất? Thời gian và quá trình sử dụng của từng người như thế nào?",
+"Có chứng kiến việc mua bán, chuyển nhượng, tặng cho, thừa kế hoặc bàn giao khu đất giữa các cá nhân, hộ gia đình không? Nếu có, cụ thể như thế nào?",
+"Việc chuyển giao được thực hiện vào thời điểm nào, giữa những ai, có lập giấy tờ hoặc người chứng kiến không?",
+"Trong quá trình sử dụng, khu đất có được xây dựng nhà ở, trồng cây, canh tác hoặc đầu tư công trình gì không? Thời điểm thực hiện?",
+"Quá trình quản lý, sử dụng đất có liên tục, ổn định không? Có thời điểm bỏ hoang, bị lấn chiếm, tranh chấp hoặc do người khác quản lý không?",
+"Diện tích, ranh giới và hiện trạng khu đất qua các thời kỳ có thay đổi không? Nếu có, thay đổi như thế nào và vì sao?"]},
+{t:"IV. Về cơ sở xác nhận nguồn gốc đất",q:[
+"Ông/bà dựa trên cơ sở nào để xác định nguồn gốc khu đất và người đã khai phá, sử dụng đất ban đầu?",
+"Những nội dung ông/bà cung cấp là do trực tiếp chứng kiến, trực tiếp tham gia hay được người khác kể lại?",
+"Nếu trực tiếp chứng kiến, ông/bà có thể xác định cụ thể thời gian, địa điểm, người tham gia và diễn biến sự việc không?",
+"Nếu thông tin do người khác cung cấp, người cung cấp thông tin là ai, có trực tiếp biết sự việc không và cung cấp vào thời điểm nào?",
+"Ông/bà có được xem, tiếp cận hoặc biết các giấy tờ, tài liệu liên quan đến nguồn gốc, quá trình quản lý, sử dụng và chuyển giao khu đất không? Cụ thể là những tài liệu nào?",
+"Có hình ảnh, giấy tờ, bản đồ, tài liệu hoặc dấu tích thực tế nào có thể chứng minh quá trình khai phá, quản lý và sử dụng khu đất không?",
+"Ông/bà có biết khu đất trước đây thuộc diện đất công, đất rừng, đất do Nhà nước hoặc tổ chức, cá nhân khác quản lý không? Căn cứ nào để biết?",
+"Có biết việc kê khai, đăng ký đất đai, cấp giấy chứng nhận quyền sử dụng đất hoặc xác nhận nguồn gốc đất của cơ quan chức năng không?"]},
+{t:"V. Về tranh chấp và các vấn đề phát sinh",q:[
+"Trong quá trình quản lý, sử dụng khu đất, ông/bà có biết việc tranh chấp, khiếu nại, tố cáo hoặc kiến nghị giữa các cá nhân, hộ gia đình liên quan không?",
+"Nội dung tranh chấp, khiếu nại cụ thể là gì? Những ai có liên quan và diễn biến như thế nào?",
+"Chính quyền địa phương hoặc cơ quan chức năng đã từng kiểm tra, xác minh, hòa giải hoặc giải quyết vụ việc chưa?",
+"Có cá nhân, tổ chức nào khác đưa ra thông tin hoặc ý kiến khác về nguồn gốc, quá trình sử dụng khu đất không? Nội dung cụ thể?",
+"Ông/bà có biết những người nào khác trực tiếp chứng kiến hoặc có tài liệu liên quan đến các nội dung nêu trên không?"]},
+{t:"VI. Về tính khách quan và khả năng cung cấp thông tin",q:[
+"Ông/bà có quyền lợi, nghĩa vụ hoặc tranh chấp liên quan đến khu đất đang được xác minh không?",
+"Có quan hệ thân thích, làm ăn, vay mượn hoặc mâu thuẫn với những người có liên quan đến khu đất không?",
+"Trước khi làm việc, ông/bà có trao đổi với ai về nội dung cần cung cấp thông tin không? Có ai đề nghị, tác động hoặc hướng dẫn ông/bà xác nhận nội dung liên quan đến nguồn gốc đất không?",
+"Đối với những nội dung đã trình bày, ông/bà có thể xác nhận cụ thể phần nào do bản thân trực tiếp biết, trực tiếp chứng kiến và phần nào chỉ nghe người khác kể lại?",
+"Ông/bà có thể cung cấp tài liệu, hình ảnh hoặc chỉ dẫn những người biết việc để cơ quan chức năng tiếp tục kiểm tra, xác minh không?",
+"Ngoài những nội dung đã trình bày, ông/bà còn biết thông tin nào khác có liên quan đến nguồn gốc và quá trình quản lý, sử dụng khu đất không?"]}
+];
+const KEY="checklist-nguon-goc-dat-v1";
+const $=id=>document.getElementById(id);
+let st={asker:"",resp:"",date:"",note:"",items:{}};
+let dirty=false;
+const total=S.reduce((a,s)=>a+s.q.length,0);
+
+const KEY2="checklist-nguon-goc-dat-v2";
+let DB={records:{},cur:null};
+const pad2=n=>String(n).padStart(2,"0");
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate())};
+// Dữ liệu lưu dạng yyyy-mm-dd (tương thích bản cũ), hiển thị/nhập dạng dd/mm/yyyy
+function isoToVn(iso){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||"");return m?m[3]+"/"+m[2]+"/"+m[1]:(iso||"")}
+function vnToIso(t){const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec((t||"").trim());if(!m)return null;
+ const d=+m[1],mo=+m[2],y=+m[3];const x=new Date(y,mo-1,d);
+ if(y<1900||x.getFullYear()!==y||x.getMonth()!==mo-1||x.getDate()!==d)return null;
+ return y+"-"+pad2(mo)+"-"+pad2(d)}
+function vnNow(t){return pad2(t.getDate())+"/"+pad2(t.getMonth()+1)+"/"+t.getFullYear()}
+const answered=items=>Object.values(items||{}).filter(x=>x&&x.a&&x.a.trim()).length;
+const uid=()=>"b"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const isSaved=()=>!!DB.records[st.id];
+function newState(asker){return {id:uid(),asker:asker||"",resp:"",date:today(),note:"",items:{}}}
+function persist(){try{localStorage.setItem(KEY2,JSON.stringify(DB));return true}catch(e){return false}}
+function load(){
+ try{const r=localStorage.getItem(KEY2);if(r){const o=JSON.parse(r);if(o&&o.records)DB=o}}catch(e){}
+ if(!Object.keys(DB.records).length){
+  try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.items){o.id=uid();o.updated=Date.now();DB.records[o.id]=o;DB.cur=o.id;persist()}}}catch(e){}
+ }
+ const c=DB.records[DB.cur];
+ st=c?clone(c):newState();
+}
+function setMsg(t){$("msg").textContent=t}
+function upd(){
+ const c=Object.values(st.items).filter(x=>x.c).length,n=answered(st.items);
+ $("pc").textContent="Đã trả lời "+n+"/"+total+" câu · đã đánh dấu hỏi "+c+" câu";
+ $("pb").style.width=(total?n/total*100:0)+"%";
+ $("ps").textContent=dirty?"Chưa lưu":"";
+ $("cur").textContent="Đang mở: "+(st.resp||"Bảng mới")+" · "+(isSaved()?(dirty?"có thay đổi chưa lưu":"đã lưu"):"chưa lưu vào danh sách");
+}
+function mark(){dirty=true;upd()}
+function render(){
+ const L=$("list");L.textContent="";let k=0;
+ S.forEach((s,si)=>{
+  const h=document.createElement("h2");h.textContent=s.t;L.appendChild(h);
+  s.q.forEach((q,qi)=>{
+   k++;const id=si+"-"+qi;const it=st.items[id]||(st.items[id]={c:false,a:""});
+   const d=document.createElement("div");d.className="q"+(it.c?" done":"");
+   const lb=document.createElement("label");lb.className="row";
+   const cb=document.createElement("input");cb.type="checkbox";cb.checked=it.c;
+   const sp=document.createElement("span");
+   const nn=document.createElement("span");nn.className="n";nn.textContent="Câu "+k+".";
+   sp.appendChild(nn);sp.appendChild(document.createTextNode(q));
+   lb.appendChild(cb);lb.appendChild(sp);d.appendChild(lb);
+   const a=document.createElement("div");a.className="ans";
+   const ta=document.createElement("textarea");ta.placeholder="Nhập câu trả lời…";ta.value=it.a;
+   a.appendChild(ta);d.appendChild(a);
+   cb.addEventListener("change",()=>{it.c=cb.checked;d.classList.toggle("done",it.c);if(it.c)ta.focus();mark()});
+   ta.addEventListener("input",()=>{it.a=ta.value;mark()});
+   L.appendChild(d);
+  });
+ });
+ upd();
+}
+function save(){
+ st.updated=Date.now();DB.records[st.id]=clone(st);DB.cur=st.id;
+ if(persist()){dirty=false;const t=new Date();setMsg("Đã lưu lúc "+pad2(t.getHours())+":"+pad2(t.getMinutes())+" – "+vnNow(t))}
+ else setMsg("Không lưu được trên trình duyệt này. Hãy dùng nút Xuất Word để giữ nội dung.");
+ upd();refreshList();
+}
+function setFields(){$("asker").value=st.asker;$("resp").value=st.resp;if(!st.date)st.date=today();$("date").value=isoToVn(st.date);dateOk(true);$("note").value=st.note||""}
+function confirmLeave(){if(dirty&&confirm("Bảng hiện tại có nội dung chưa lưu.\nBấm OK để lưu trước, bấm Hủy để bỏ các thay đổi."))save()}
+function closeList(){try{$("lst").close()}catch(e){$("lst").removeAttribute("open")}}
+function openList(){refreshList();try{$("lst").showModal()}catch(e){$("lst").setAttribute("open","")}}
+function loadRec(id){
+ if(!DB.records[id])return;confirmLeave();
+ st=clone(DB.records[id]);dirty=false;DB.cur=id;persist();setFields();render();closeList();
+ setMsg("Đã mở bảng của "+(st.resp||"(chưa ghi tên)"));window.scrollTo(0,0);
+}
+function newRec(){
+ confirmLeave();st=newState(st.asker);dirty=false;setFields();render();closeList();
+ setMsg("Đã tạo bảng mới. Bấm Lưu để đưa vào danh sách.");window.scrollTo(0,0);
+}
+function delRec(id){
+ const r=DB.records[id];if(!r)return;
+ if(!confirm("Xóa bảng của "+(r.resp||"(chưa ghi tên)")+"? Không thể khôi phục."))return;
+ delete DB.records[id];if(DB.cur===id)DB.cur=null;persist();
+ if(st.id===id){st=newState(st.asker);dirty=false;setFields();render()}
+ refreshList();upd();
+}
+function refreshList(){
+ const ids=Object.keys(DB.records).sort((a,b)=>(DB.records[b].updated||0)-(DB.records[a].updated||0));
+ $("cnt").textContent=ids.length?"("+ids.length+")":"";
+ const L=$("lstBody");L.textContent="";
+ if(!ids.length){const p=document.createElement("p");p.className="empty";p.textContent="Chưa có bảng nào được lưu.";L.appendChild(p);return}
+ ids.forEach(id=>{
+  const r=DB.records[id];
+  const n=answered(r.items);
+  const ds=r.date?isoToVn(r.date):"—";
+  const d=document.createElement("div");d.className="li"+(id===st.id?" cur":"");
+  const m=document.createElement("div");m.className="lm";
+  const t=document.createElement("b");t.textContent=(r.resp||"(Chưa ghi tên người trả lời)")+(id===st.id?" – đang mở":"");
+  const sub=document.createElement("div");sub.className="ls";
+  sub.textContent="Người hỏi: "+(r.asker||"—")+" · Ngày: "+ds+" · "+n+"/"+total+" câu đã trả lời";
+  m.appendChild(t);m.appendChild(sub);
+  const b1=document.createElement("button");b1.textContent="Mở";b1.className="pri";b1.onclick=()=>loadRec(id);
+  const b2=document.createElement("button");b2.textContent="Xóa";b2.className="out";b2.onclick=()=>delRec(id);
+  d.appendChild(m);d.appendChild(b1);d.appendChild(b2);L.appendChild(d);
+ });
+}
+function fdate(){return st.date?isoToVn(st.date):""}
+function buildText(){
+ let o=TITLE+"\n\nNgười hỏi: "+(st.asker||"……")+"\nNgười trả lời: "+(st.resp||"……")+"\nNgày làm việc: "+(fdate()||"……")+"\n";
+ const nt=(st.note||"").trim();if(nt)o+="\nGhi chú chung: "+nt.replace(/\n/g,"\n    ")+"\n";
+ let k=0;
+ S.forEach((s,si)=>{let h=false;
+  s.q.forEach((q,qi)=>{k++;const it=st.items[si+"-"+qi]||{};const a=(it.a||"").trim();if(!a)return;
+   if(!h){h=true;o+="\n"+s.t.toUpperCase()+"\n"}
+   o+="\nCâu "+k+". "+q+"\n    Trả lời: "+a.replace(/\n/g,"\n    ")+"\n";
+  });
+ });
+ return o;
+}
+const esc=x=>String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+function vnWords(n){
+ const u=["không","một","hai","ba","bốn","năm","sáu","bảy","tám","chín"];
+ if(n<10)return u[n];
+ if(n===10)return "mười";
+ if(n<20)return "mười "+(n%10===5?"lăm":u[n%10]);
+ const t=Math.floor(n/10),r=n%10;
+ return u[t]+" mươi"+(r===0?"":" "+(r===1?"mốt":r===5?"lăm":u[r]));
+}
+function buildBody(){
+ const F="font-family:Arial,'Segoe UI',sans-serif;";
+ const TD="border:none;border-bottom:1px solid #bdbdbd;padding:9px 10px;vertical-align:top;font-size:11.5pt;line-height:1.4;"+F;
+ const dstr=fdate()||"……………";
+ let k=0,rows=0,body="";
+ const nt=(st.note||"").trim();
+ if(nt)body+="<tr><td style=\""+TD+";width:40%;color:#222\">Ghi chú chung</td><td style=\""+TD+";width:60%\">"+esc(nt)+"</td></tr>";
+ S.forEach((s,si)=>{let hd=false;
+  s.q.forEach((q,qi)=>{k++;const it=st.items[si+"-"+qi]||{};const an=(it.a||"").trim();if(!an)return;
+   if(!hd){hd=true;body+="<tr><td colspan=\"2\" style=\""+TD+";font-weight:bold;color:#2b6fd4;padding-top:16px\">"+esc(s.t)+"</td></tr>"}
+   rows++;
+   body+="<tr><td style=\""+TD+";width:40%;color:#222\"><b>Câu "+k+".</b> "+esc(q)+"</td><td style=\""+TD+";width:60%\">"+esc(an)+"</td></tr>";
+  });
+ });
+ if(!rows)body+="<tr><td colspan=\"2\" style=\""+TD+";text-align:center;color:#666\">Chưa có câu trả lời</td></tr>";
+ let h="<div style=\""+F+"\">";
+ h+="<div style=\"font-size:17pt;font-weight:bold;margin:0 0 6px;"+F+"\">Kết quả xác minh nguồn gốc đất</div>";
+ h+="<div style=\"font-size:11pt;color:#666;line-height:1.5;margin-bottom:14px;"+F+"\">Người hỏi: "+esc(st.asker||"……………")+" · Người trả lời: "+esc(st.resp||"……………")+" · Ngày làm việc: "+esc(dstr)+"</div>";
+ h+="<div style=\"font-size:14pt;margin:0 0 2px;"+F+"\">Số câu hỏi đã có trả lời</div>";
+ h+="<div style=\"font-size:26pt;font-weight:bold;color:#2b6fd4;margin:0;"+F+"\">"+rows+"/"+k+" câu</div>";
+ const w=vnWords(rows);
+ h+="<div style=\"font-size:12pt;font-style:italic;color:#666;margin:2px 0 14px;"+F+"\">"+esc(w.charAt(0).toUpperCase()+w.slice(1))+" câu trên tổng số "+esc(vnWords(k))+" câu hỏi</div>";
+ h+="<table style=\"width:100%;border-collapse:collapse\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tbody>"+body+"</tbody></table></div>";
+ return h;
+}
+let NONWORD;try{NONWORD=new RegExp("[^\\p{L}\\p{N}]+","gu")}catch(e){NONWORD=/[\s\/\\:*?"<>|.,;]+/g}
+async function doExport(){
+ const doc="<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w=\"urn:schemas-microsoft-com:office:word\"><head><meta charset=\"utf-8\"><title>Bảng kết quả</title></head><body>"+buildBody()+"</body></html>";
+ const nm="bang-ket-qua-"+((st.resp||"nguoi-tra-loi").trim().replace(NONWORD,"-").replace(/^-|-$/g,"")||"nguoi-tra-loi")+".html";
+ let dl=null;
+ try{dl=window.claude&&await window.claude.use("downloads")}catch(e){}
+ if(dl){
+  try{await dl.save({filename:nm,data:doc});setMsg("Đã xuất file "+nm+" (mở bằng Word được)");return}
+  catch(e){if(e&&e.code==="declined")return}
+ }
+ $("dtx").value=buildText();
+ try{$("dlg").showModal()}catch(e2){$("dlg").setAttribute("open","")}
+}
+function doPrint(){
+ $("printView").innerHTML=buildBody();
+ window.print();
+}
+function quit(){
+ if(dirty){
+  const wantSave=confirm("Có nội dung chưa lưu.\nBấm OK để lưu trước khi thoát, bấm Hủy để thoát mà không lưu.");
+  if(wantSave)save();
+ }
+ $("app").style.display="none";$("btns").style.display="none";$("bye").style.display="block";
+ try{window.close()}catch(e){}
+}
+
+function fitBar(){const h=$("btns").offsetHeight;if(h)document.documentElement.style.setProperty("--bh",h+"px")}
+window.addEventListener("resize",fitBar);window.addEventListener("orientationchange",()=>setTimeout(fitBar,300));
+try{new ResizeObserver(fitBar).observe($("btns"))}catch(e){}
+// ===== Sao lưu / khôi phục / xóa tất cả =====
+function stamp(){const t=new Date();return t.getFullYear()+pad2(t.getMonth()+1)+pad2(t.getDate())+"-"+pad2(t.getHours())+pad2(t.getMinutes())}
+async function backup(){
+ if(dirty)save();
+ const n=Object.keys(DB.records).length;if(!n){alert("Chưa có bảng nào để sao lưu.");return}
+ const data=JSON.stringify({app:"checklist-nguon-goc-dat",version:2,exported:new Date().toISOString(),records:DB.records});
+ const nm="sao-luu-so-xac-minh-"+stamp()+".json";
+ try{const f=new File([data],nm,{type:"application/json"});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:nm});setMsg("Đã sao lưu "+n+" bảng.");return}
+ }catch(e){if(e&&e.name==="AbortError")return}
+ const u=URL.createObjectURL(new Blob([data],{type:"application/json"}));const a=document.createElement("a");a.href=u;a.download=nm;document.body.appendChild(a);a.click();
+ setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},1500);setMsg("Đã sao lưu "+n+" bảng vào file "+nm);
+}
+function restoreFile(file){
+ const rd=new FileReader();
+ rd.onload=()=>{let o;try{o=JSON.parse(rd.result)}catch(e){alert("File không đúng định dạng sao lưu.");return}
+  const recs=o&&o.records;if(!recs||typeof recs!=="object"){alert("File không đúng định dạng sao lưu.");return}
+  let add=0,upd2=0;
+  Object.keys(recs).forEach(id=>{const r=recs[id];if(!r||typeof r!=="object"||!r.items)return;r.id=id;
+   const cur=DB.records[id];if(!cur){DB.records[id]=r;add++}else if((r.updated||0)>(cur.updated||0)){DB.records[id]=r;upd2++}});
+  persist();refreshList();upd();
+  alert("Khôi phục xong: thêm "+add+" bảng, cập nhật "+upd2+" bảng. Các bảng đang có trên máy được giữ nguyên.");
+ };
+ rd.readAsText(file);
+}
+function clearAll(){
+ const n=Object.keys(DB.records).length;if(!n)return;
+ if(!confirm("Xóa toàn bộ "+n+" bảng trên máy này?\nNên bấm Sao lưu trước. Không thể khôi phục nếu chưa sao lưu."))return;
+ if(!confirm("Chắc chắn xóa hết?"))return;
+ DB={records:{},cur:null};persist();st=newState(st.asker);dirty=false;setFields();render();refreshList();setMsg("Đã xóa toàn bộ các bảng.");
+}
+$("lBak").onclick=backup;
+$("lRes").onclick=()=>{$("resFile").value="";$("resFile").click()};
+$("resFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)restoreFile(f)});
+$("lClr").onclick=clearAll;
+// ===== Chạy khi không có mạng + gợi ý thêm ra màn hình chính =====
+if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+(function(){
+ const standalone=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone;
+ const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+ let off=false;try{off=localStorage.getItem("sxm-hint-off")==="1"}catch(e){}
+ if(standalone||!mobile||off||!/^https?:$/.test(location.protocol))return;
+ const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+ const inapp=/Zalo|FBAN|FBAV|Messenger|Instagram|Line\//i.test(navigator.userAgent);
+ const h=$("hint");
+ h.innerHTML=inapp?"<b>Đang mở trong Zalo/Messenger</b>Bấm dấu ⋯ (hoặc ⋮) ở góc trên rồi chọn <b style='display:inline'>Mở bằng trình duyệt</b> để dùng được khi không có mạng."
+  :ios?"<b>Dùng được khi không có mạng</b>Bấm nút Chia sẻ <span style='font-size:16px'>⎋</span> ở thanh dưới của Safari, rồi chọn <b style='display:inline'>Thêm vào MH chính</b>. Lần sau chạm biểu tượng 📋 để mở."
+  :"<b>Dùng được khi không có mạng</b>Bấm dấu ⋮ ở góc trên của Chrome, rồi chọn <b style='display:inline'>Thêm vào màn hình chính</b> (hoặc Cài đặt ứng dụng). Lần sau chạm biểu tượng 📋 để mở.";
+ const b=document.createElement("button");b.textContent="Đã hiểu, ẩn đi";b.onclick=()=>{h.style.display="none";try{localStorage.setItem("sxm-hint-off","1")}catch(e){}};
+ h.appendChild(document.createElement("br"));h.appendChild(b);h.style.display="block";
+})();
+load();setFields();refreshList();
+$("asker").addEventListener("input",e=>{st.asker=e.target.value;mark()});
+$("resp").addEventListener("input",e=>{st.resp=e.target.value;mark()});
+function dateOk(ok){$("date").classList.toggle("bad",!ok);$("dErr").textContent=ok?"":"Ngày không hợp lệ. Nhập theo dạng dd/mm/yyyy, ví dụ 05/03/2025."}
+function commitDate(){const t=$("date").value.trim();
+ if(!t){if(st.date){st.date="";mark()}dateOk(true);return}
+ const iso=vnToIso(t);if(!iso){dateOk(false);return}
+ dateOk(true);$("date").value=isoToVn(iso);if(iso!==st.date){st.date=iso;mark()}}
+$("date").addEventListener("input",e=>{const el=e.target;
+ if(e.inputType&&e.inputType.startsWith("delete"))return;
+ let v=el.value.replace(/[^\d\/]/g,"");
+ const pt=v.split("/");
+ if(!(pt.length<=3&&pt.every((x,i)=>x.length<=(i===2?4:2))&&pt.slice(0,-1).every(x=>x.length>0))){const d=v.replace(/\D/g,"").slice(0,8);v=d.length>4?d.slice(0,2)+"/"+d.slice(2,4)+"/"+d.slice(4):d.length>2?d.slice(0,2)+"/"+d.slice(2):d}
+ if(v!==el.value)el.value=v;
+ if(vnToIso(v))commitDate();else if(v.length===10)dateOk(false);else dateOk(true)});
+$("date").addEventListener("change",commitDate);
+$("date").addEventListener("blur",commitDate);
+$("dCal").onclick=()=>{const p=$("dPick");p.value=vnToIso($("date").value)||st.date||today();
+ try{if(p.showPicker){p.showPicker();return}}catch(e){}
+ p.style.pointerEvents="auto";p.focus();p.click();p.style.pointerEvents=""};
+$("dPick").addEventListener("change",e=>{if(e.target.value){$("date").value=isoToVn(e.target.value);commitDate()}});
+$("note").addEventListener("input",e=>{st.note=e.target.value;mark()});
+$("bSave").onclick=save;
+$("bNew").onclick=newRec;
+$("lNew").onclick=newRec;
+$("bList").onclick=openList;
+$("lClose").onclick=closeList;
+function openPreview(){
+ $("pvBody").innerHTML=buildBody();
+ try{$("pv").showModal()}catch(e){$("pv").setAttribute("open","")}
+ $("pvBody").scrollTop=0;
+}
+$("bPrev").onclick=openPreview;
+$("bExp").onclick=openPreview;
+$("bPrint").onclick=doPrint;
+$("pvClose").onclick=()=>$("pv").close();
+$("pvExp").onclick=doExport;
+$("pvPrint").onclick=()=>{try{$("pv").close()}catch(e){}doPrint()};
+$("bQuit").onclick=quit;
+$("bBack").onclick=()=>{$("bye").style.display="none";$("app").style.display="";$("btns").style.display=""};
+$("dClose").onclick=()=>$("dlg").close();
+$("dCopy").onclick=()=>{const t=$("dtx");t.select();let ok=false;try{ok=document.execCommand("copy")}catch(e){}
+ if(!ok&&navigator.clipboard){navigator.clipboard.writeText(t.value).catch(()=>{})}$("dCopy").textContent="Đã sao chép";setTimeout(()=>$("dCopy").textContent="Sao chép",1500)};
+render();fitBar();
+</script>
+</body>
+</html>
