@@ -6,3 +6,4 @@ Công cụ ghi chép nhanh tại hiện trường cho cán bộ xác minh nguồ
 - Ghi chép chỉ lưu trên điện thoại của từng người, không gửi lên mạng.
 - Dùng được khi không có mạng sau khi mở lần đầu và thêm ra màn hình chính.
 - Khi cập nhật `index.html`, tăng số phiên bản `CACHE` trong `sw.js` để máy người dùng nhận bản mới.
+- Khi đổi bộ câu hỏi: không sửa `QSET_1`; thêm `QSET_2` (và các bộ sau), khai báo trong `QSETS` và tăng `CURQ`. Các bảng cũ luôn hiện theo đúng bộ câu hỏi lúc ghi.

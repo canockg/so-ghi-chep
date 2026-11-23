@@ -121,6 +121,7 @@ input.bad{border-color:var(--warn);outline-color:var(--warn)}
 #hint button{flex:none;max-width:none;padding:4px 10px;font-size:13px;margin-top:6px}
 .lbk{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 10px}
 .lbk button{flex:1 1 30%;max-width:none;font-size:14px;padding:8px 6px}
+.qvnote{background:#fff4e5;color:#7a3e00;border:1px solid #f0b46a;border-radius:10px;padding:9px 12px;margin:10px 0;font-size:14px}
 </style>
 </head>
 <body>
@@ -155,7 +156,9 @@ input.bad{border-color:var(--warn);outline-color:var(--warn)}
 <script>
 document.getElementById("nojs").style.display="none";
 const TITLE="ĐỀ CƯƠNG CÂU HỎI ĐỐI VỚI NGƯỜI BIẾT VIỆC LIÊN QUAN ĐẾN NGUỒN GỐC ĐẤT";
-const S=[
+// ===== CÁC BỘ CÂU HỎI =====
+// Không sửa/xóa bộ cũ. Khi đổi câu hỏi: thêm QSET_2 = [...], ghi vào QSETS và tăng CURQ.
+const QSET_1=[
 {t:"I. Về nhân thân và quá trình sinh sống tại địa phương",q:[
 "Ông/bà sinh sống tại địa phương từ thời gian nào? Quá trình cư trú, sinh sống và làm việc tại địa phương qua các thời kỳ như thế nào?",
 "Ông/bà có biết khu đất đang được xác minh không? Biết từ thời điểm nào và thông qua những điều kiện, hoàn cảnh nào?",
@@ -198,11 +201,16 @@ const S=[
 "Ông/bà có thể cung cấp tài liệu, hình ảnh hoặc chỉ dẫn những người biết việc để cơ quan chức năng tiếp tục kiểm tra, xác minh không?",
 "Ngoài những nội dung đã trình bày, ông/bà còn biết thông tin nào khác có liên quan đến nguồn gốc và quá trình quản lý, sử dụng khu đất không?"]}
 ];
+const QSETS={1:QSET_1};
+const CURQ=1;
+const qvOf=r=>(r&&r.qv)||1;
+const qs=r=>QSETS[qvOf(r)]||QSETS[CURQ];
+const totalOf=set=>set.reduce((a,x)=>a+x.q.length,0);
 const KEY="checklist-nguon-goc-dat-v1";
 const $=id=>document.getElementById(id);
 let st={asker:"",resp:"",date:"",note:"",items:{}};
 let dirty=false;
-const total=S.reduce((a,s)=>a+s.q.length,0);
+
 
 const KEY2="checklist-nguon-goc-dat-v2";
 let DB={records:{},cur:null};
@@ -219,7 +227,7 @@ const answered=items=>Object.values(items||{}).filter(x=>x&&x.a&&x.a.trim()).len
 const uid=()=>"b"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const clone=o=>JSON.parse(JSON.stringify(o));
 const isSaved=()=>!!DB.records[st.id];
-function newState(asker){return {id:uid(),asker:asker||"",resp:"",date:today(),note:"",items:{}}}
+function newState(asker){return {id:uid(),qv:CURQ,asker:asker||"",resp:"",date:today(),note:"",items:{}}}
 function persist(){try{localStorage.setItem(KEY2,JSON.stringify(DB));return true}catch(e){return false}}
 function load(){
  try{const r=localStorage.getItem(KEY2);if(r){const o=JSON.parse(r);if(o&&o.records)DB=o}}catch(e){}
@@ -232,15 +240,19 @@ function load(){
 function setMsg(t){$("msg").textContent=t}
 function upd(){
  const c=Object.values(st.items).filter(x=>x.c).length,n=answered(st.items);
+ const total=totalOf(qs(st));
  $("pc").textContent="Đã trả lời "+n+"/"+total+" câu · đã đánh dấu hỏi "+c+" câu";
- $("pb").style.width=(total?n/total*100:0)+"%";
+ $("pb").style.width=(total?Math.min(n,total)/total*100:0)+"%";
  $("ps").textContent=dirty?"Chưa lưu":"";
  $("cur").textContent="Đang mở: "+(st.resp||"Bảng mới")+" · "+(isSaved()?(dirty?"có thay đổi chưa lưu":"đã lưu"):"chưa lưu vào danh sách");
 }
 function mark(){dirty=true;upd()}
 function render(){
  const L=$("list");L.textContent="";let k=0;
- S.forEach((s,si)=>{
+ if(qvOf(st)!==CURQ){const w=document.createElement("div");w.className="qvnote";
+  w.textContent=QSETS[qvOf(st)]?"Bảng này làm theo bộ câu hỏi cũ (số "+qvOf(st)+"). Câu hỏi và câu trả lời được giữ nguyên như lúc ghi.":"Bảng này làm theo bộ câu hỏi số "+qvOf(st)+", mới hơn bản ứng dụng đang dùng. Hãy mở lại ứng dụng khi có mạng để cập nhật, tránh hiện sai câu hỏi.";
+  L.appendChild(w)}
+ qs(st).forEach((s,si)=>{
   const h=document.createElement("h2");h.textContent=s.t;L.appendChild(h);
   s.q.forEach((q,qi)=>{
    k++;const id=si+"-"+qi;const it=st.items[id]||(st.items[id]={c:false,a:""});
@@ -300,7 +312,7 @@ function refreshList(){
   const m=document.createElement("div");m.className="lm";
   const t=document.createElement("b");t.textContent=(r.resp||"(Chưa ghi tên người trả lời)")+(id===st.id?" – đang mở":"");
   const sub=document.createElement("div");sub.className="ls";
-  sub.textContent="Người hỏi: "+(r.asker||"—")+" · Ngày: "+ds+" · "+n+"/"+total+" câu đã trả lời";
+  sub.textContent="Người hỏi: "+(r.asker||"—")+" · Ngày: "+ds+" · "+n+"/"+totalOf(qs(r))+" câu đã trả lời"+(qvOf(r)!==CURQ?" · bộ câu hỏi số "+qvOf(r):"");
   m.appendChild(t);m.appendChild(sub);
   const b1=document.createElement("button");b1.textContent="Mở";b1.className="pri";b1.onclick=()=>loadRec(id);
   const b2=document.createElement("button");b2.textContent="Xóa";b2.className="out";b2.onclick=()=>delRec(id);
@@ -312,7 +324,7 @@ function buildText(){
  let o=TITLE+"\n\nNgười hỏi: "+(st.asker||"……")+"\nNgười trả lời: "+(st.resp||"……")+"\nNgày làm việc: "+(fdate()||"……")+"\n";
  const nt=(st.note||"").trim();if(nt)o+="\nGhi chú chung: "+nt.replace(/\n/g,"\n    ")+"\n";
  let k=0;
- S.forEach((s,si)=>{let h=false;
+ qs(st).forEach((s,si)=>{let h=false;
   s.q.forEach((q,qi)=>{k++;const it=st.items[si+"-"+qi]||{};const a=(it.a||"").trim();if(!a)return;
    if(!h){h=true;o+="\n"+s.t.toUpperCase()+"\n"}
    o+="\nCâu "+k+". "+q+"\n    Trả lời: "+a.replace(/\n/g,"\n    ")+"\n";
@@ -336,7 +348,7 @@ function buildBody(){
  let k=0,rows=0,body="";
  const nt=(st.note||"").trim();
  if(nt)body+="<tr><td style=\""+TD+";width:40%;color:#222\">Ghi chú chung</td><td style=\""+TD+";width:60%\">"+esc(nt)+"</td></tr>";
- S.forEach((s,si)=>{let hd=false;
+ qs(st).forEach((s,si)=>{let hd=false;
   s.q.forEach((q,qi)=>{k++;const it=st.items[si+"-"+qi]||{};const an=(it.a||"").trim();if(!an)return;
    if(!hd){hd=true;body+="<tr><td colspan=\"2\" style=\""+TD+";font-weight:bold;color:#2b6fd4;padding-top:16px\">"+esc(s.t)+"</td></tr>"}
    rows++;
@@ -388,7 +400,7 @@ function stamp(){const t=new Date();return t.getFullYear()+pad2(t.getMonth()+1)+
 async function backup(){
  if(dirty)save();
  const n=Object.keys(DB.records).length;if(!n){alert("Chưa có bảng nào để sao lưu.");return}
- const data=JSON.stringify({app:"checklist-nguon-goc-dat",version:2,exported:new Date().toISOString(),records:DB.records});
+ const data=JSON.stringify({app:"checklist-nguon-goc-dat",version:2,curq:CURQ,exported:new Date().toISOString(),records:DB.records});
  const nm="sao-luu-so-xac-minh-"+stamp()+".json";
  try{const f=new File([data],nm,{type:"application/json"});
   if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:nm});setMsg("Đã sao lưu "+n+" bảng.");return}

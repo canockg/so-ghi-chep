@@ -1,5 +1,5 @@
 // Mỗi lần cập nhật ứng dụng, tăng số phiên bản này để máy người dùng tự tải bản mới.
-const CACHE = "so-xac-minh-v1";
+const CACHE = "so-xac-minh-v2";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
